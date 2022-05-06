@@ -21,7 +21,7 @@ directory
 ```
     pip install -U cryptoauthlib
 ```
- 
+
 ### If you ever need to remove your installation:
 ```
     pip uninstall cryptoauthlib
@@ -32,7 +32,7 @@ CryptoAuthLib module gives access to most functions available as part of standar
 (which is written in 'C'). These python functions for the most part are very similar to 'C'
 functions. The module in short acts as a wrapper over the 'C' cryptoauth library functions.
 
-Microchip cryptoauthlib product page: 
+Microchip cryptoauthlib product page:
 [Link]( http://www.microchip.com/SWLibraryWeb/product.aspx?product=CryptoAuthLib)
 
 ## Supported hardware
@@ -82,7 +82,7 @@ void main()
     }
 }
 ```
-    
+
 The same code in python would be:
 
 ```python
@@ -167,7 +167,7 @@ argument, attempt to return a list of valid attributes for that object. For exam
 dir(cryptoauthlib) will return all the methods available in the cryptoauthlib module.
 
 ## Code Examples
-Code examples for python are available on github as part of 
+Code examples for python are available on github as part of
 [CryptoAuthTools](https://github.com/MicrochipTech/cryptoauthtools/tree/master/python/examples) under the
 python/examples directory
 
@@ -181,5 +181,3 @@ the interfaces are correct and ctypes structures match the platform.
 Release notes
 -----------
 See [Release Notes](release_notes.md)
-
-

@@ -3,12 +3,13 @@
 #define ATCA_CONFIG_H
 
 /* Included HALS */
+#cmakedefine ATCA_HAL_KIT_UART
 #cmakedefine ATCA_HAL_KIT_HID
 #cmakedefine ATCA_HAL_I2C
 #cmakedefine ATCA_HAL_SPI
 #cmakedefine ATCA_HAL_KIT_BRIDGE
 #cmakedefine ATCA_HAL_CUSTOM
-#cmakedefine ATCA_HAL_SWI
+#cmakedefine ATCA_HAL_SWI_UART
 #cmakedefine ATCA_HAL_1WIRE
 
 
@@ -65,6 +66,13 @@
 #cmakedefine ATCA_MBEDTLS
 #cmakedefine ATCA_OPENSSL
 #cmakedefine ATCA_WOLFSSL
+
+#ifdef ATCA_WOLFSSL
+#cmakedefine WOLFSSL_USER_SETTINGS
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#endif
+#endif
 
 /** Additional Runtime Configuration */
 #cmakedefine ATCA_LIBRARY_CONF  "@ATCA_LIBRARY_CONF@"

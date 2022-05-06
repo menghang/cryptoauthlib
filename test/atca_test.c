@@ -228,7 +228,7 @@ void RunTNGTests(void)
     RunAllTests(tng_tests);
 }
 
-#if defined(ATCA_MBEDTLS) || defined(ATCA_WOLFSSL) || defined(ATCA_OPENSSL)
+#if defined(ATCA_MBEDTLS)
 void RunCryptoIntegrationTests(void)
 {
     RunAllTests(crypto_integration_tests);
@@ -436,4 +436,3 @@ TEST_TEAR_DOWN(atca_cmd_basic_test)
 
     UnityMalloc_EndTest();
 }
-

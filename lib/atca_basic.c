@@ -106,6 +106,16 @@ ATCA_STATUS atcab_init_ext(ATCADevice* device, ATCAIfaceCfg *cfg)
             (*device)->clock_divider &= ATCA_CHIPMODE_CLOCK_DIV_MASK;
         }
 #endif
+
+#ifdef ATCA_ECC204_SUPPORT
+        /* To compatible with kitprotocol firmware on otherside */
+        /* On kitprotocol firmware, during discovery time itself ECC204 would have woke up */
+        if ((ECC204 == cfg->devtype) && (atca_iface_is_kit(atGetIFace(*device))))
+        {
+            (*device)->device_state = ATCA_DEVICE_STATE_ACTIVE;
+        }
+#endif
+
     }
 
     return ATCA_SUCCESS;
@@ -1611,7 +1621,16 @@ ATCA_STATUS atcab_lock_config_zone_crc(uint16_t summary_crc)
     if (atcab_is_ca_device(dev_type))
     {
 #if ATCA_CA_SUPPORT
-        status = calib_lock_config_zone_crc(_gDevice, summary_crc);
+        if (ECC204 == dev_type)
+        {
+#if defined(ATCA_ECC204_SUPPORT)
+            status = ATCA_UNIMPLEMENTED;
+#endif
+        }
+        else
+        {
+            status = calib_lock_config_zone_crc(_gDevice, summary_crc);
+        }
 #endif
     }
     else if (atcab_is_ta_device(dev_type))
@@ -1642,7 +1661,16 @@ ATCA_STATUS atcab_lock_data_zone(void)
     if (atcab_is_ca_device(dev_type))
     {
 #if ATCA_CA_SUPPORT
-        status = calib_lock_data_zone(_gDevice);
+        if (ECC204 == dev_type)
+        {
+#if defined(ATCA_ECC204_SUPPORT)
+            status = calib_ecc204_lock_data_zone(_gDevice);
+#endif
+        }
+        else
+        {
+            status = calib_lock_data_zone(_gDevice);
+        }
 #endif
     }
     else if (atcab_is_ta_device(dev_type))
@@ -1676,7 +1704,16 @@ ATCA_STATUS atcab_lock_data_zone_crc(uint16_t summary_crc)
     if (atcab_is_ca_device(dev_type))
     {
 #if ATCA_CA_SUPPORT
-        status = calib_lock_data_zone_crc(_gDevice, summary_crc);
+        if (ECC204 == dev_type)
+        {
+#if defined(ATCA_ECC204_SUPPORT)
+            status = ATCA_UNIMPLEMENTED;
+#endif
+        }
+        else
+        {
+            status = calib_lock_data_zone_crc(_gDevice, summary_crc);
+        }
 #endif
     }
     else if (atcab_is_ta_device(dev_type))
@@ -2186,7 +2223,7 @@ ATCA_STATUS atcab_is_config_locked(bool* is_locked)
         if (ECC204 == dev_type)
         {
 #if defined(ATCA_ECC204_SUPPORT)
-            status = calib_ecc204_is_locked(_gDevice, ATCA_ECC204_ZONE_CONFIG, is_locked);
+            status = calib_ecc204_is_locked(_gDevice, ATCA_ZONE_CONFIG, is_locked);
 #endif
         }
         else
@@ -2221,13 +2258,13 @@ ATCA_STATUS atcab_is_data_locked(bool* is_locked)
     if (atcab_is_ca_device(dev_type))
     {
 #if ATCA_CA_SUPPORT
-#if defined(ATCA_ECC204_SUPPORT)
         if (ECC204 == dev_type)
         {
-            status = calib_ecc204_is_locked(_gDevice, ATCA_ECC204_ZONE_DATA, is_locked);
+#if defined(ATCA_ECC204_SUPPORT)
+            status = calib_ecc204_is_locked(_gDevice, ATCA_ZONE_DATA, is_locked);
+#endif
         }
         else
-#endif
         {
             status = calib_is_locked(_gDevice, LOCK_ZONE_DATA, is_locked);
         }

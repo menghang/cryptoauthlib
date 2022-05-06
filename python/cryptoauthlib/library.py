@@ -22,7 +22,7 @@ Cryptoauthlib Library Management
 # THIS SOFTWARE.
 
 import os.path
-import json
+import sys
 from ctypes import *
 from ctypes.util import find_library
 from .exceptions import LibraryLoadError
@@ -69,6 +69,21 @@ class AtcaReference:
         return str(self.value)
 
 
+def _force_local_library():
+    """
+    In some environments loading seems to fail under all circumstances unless
+    brute forcing it.
+    """
+    curr_path = os.path.dirname(__file__)
+
+    if sys.platform.startswith('win'):
+        return os.path.join(curr_path, "cryptoauth.dll")
+    elif sys.platform.startswith('darwin'):
+        return os.path.join(curr_path, "libcryptoauth.dylib")
+    else:
+        return os.path.join(curr_path, "libcryptoauth.so")
+
+
 def load_cryptoauthlib(lib=None):
     """
     Load CryptoAauthLib into Python environment
@@ -79,10 +94,16 @@ def load_cryptoauthlib(lib=None):
         _CRYPTO_LIB = lib
     else:
         try:
-            os.environ['PATH'] = os.path.dirname(__file__) + os.pathsep + os.environ['PATH']
-            _CRYPTO_LIB = cdll.LoadLibrary(find_library('cryptoauth'))
+            library_file = find_library('cryptoauth')
+            if library_file is None:
+                library_file = _force_local_library()
+            _CRYPTO_LIB = cdll.LoadLibrary(library_file)
         except:
-            raise LibraryLoadError('Unable to find cryptoauthlib. You may need to reinstall')
+            try:
+                _CRYPTO_LIB = cdll.LoadLibrary(_force_local_library())
+            except:
+                raise LibraryLoadError('Unable to find cryptoauthlib. You may need to reinstall')
+
 
 
 def get_cryptoauthlib():

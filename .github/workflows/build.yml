@@ -16,44 +16,37 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v2
-        name: Install Python
-        with:
-          python-version: '3.7'
-
       - name: Describe Tag & Branch Name
         id: build_names
         shell: bash
         run: |
           echo ::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}
 
-      - name: Install cibuildwheel
-        run: |
-          python -m pip install cibuildwheel
-
-      - name: Install Visual C++ for Python 2.7
-        if: runner.os == 'Windows'
-        run: |
-          choco install vcpython27 -f -y
-
-      - name: Build wheels
+      - name: Configure Environment
         shell: bash
         run: |
           echo $TAG_NAME
           cd python
           echo $TAG_NAME >VERSION
+          cp ../release_notes.md .
           cp -r ../lib .
           cp -r ../third_party .
           mkdir app
           cp -r ../app/tng app
-          python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_BUILD_VERBOSITY: 3
           TAG_NAME: ${{ steps.build_names.outputs.TAG_NAME }}
+
+      - name: Build wheels
+        uses: joerick/cibuildwheel@v1.11.0
+        with:
+          package-dir: python 
+        env:
+#          CIBW_SKIP: "*-win32"
+          CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v2
         with:
-          path: python/wheelhouse/*.whl
+          path: wheelhouse/*.whl
 
   build_sdist:
     name: Build source distribution
